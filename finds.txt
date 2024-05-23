@@ -1,0 +1,10 @@
+-> apache/arrow
+commit hash: 92682f0f6064224acd6dd746ac45d6df4b1963c4 (COMMITED ON JANUARY 19 2024)
+link to changes: https://github.com/apache/arrow/commit/92682f0f6064224acd6dd746ac45d6df4b1963c4
+link to conversation about the commit: https://github.com/apache/arrow/pull/39221 (PULL REQUEST)
+
+
+
+-> JetBrains/Kotlin
+commit hash: 2d41c7d462529cae91d7b9c7311efc2b77d49e4b (COMMITED ON APRIL 3 2018)
+link to changes: https://github.com/JetBrains/kotlin/commit/2d41c7d462529cae91d7b9c7311efc2b77d49e4b (NOT A PULL REQUEST)

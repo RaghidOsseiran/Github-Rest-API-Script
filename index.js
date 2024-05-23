@@ -11,26 +11,16 @@ const app = express()
 
 app.use(express.json()) // lets us parse JSON from the request body
 
-app.get('/', (req, res) => {
-    res.json('Hello World!')
-}
-)
-
-
-app.get('/repos', async (req, res) => {
-    const { data } = await octokit.request('GET /user/repos')
-    res.json(data)
-}
-)
 
 
 app.get('/modules', async (req, res) => {
-    const query = 'path:**/module-info.java+language:Java'
-    const { data } = await octokit.request('GET /search/code', {
+    const query = 'module-info.java+language:Java'
+    const { data } = await octokit.request('GET /search/commits', {
+        accept: 'application/vnd.github.text-match+json',
         q: query
     })
     res.json(data)
-}
+    }
 )
 
 
