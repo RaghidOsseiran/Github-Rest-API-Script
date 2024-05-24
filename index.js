@@ -1,4 +1,4 @@
-import express from 'express'
+import express, { text } from 'express'
 import { Octokit } from 'octokit'
 import dotenv from 'dotenv'
 import fetch from 'node-fetch'
@@ -12,9 +12,15 @@ const app = express()
 app.use(express.json()) // lets us parse JSON from the request body
 
 
+const sendButton = document.getElementById("item-in-URL")
+sendButton.addEventListener("click", sendRequest)
+
+
+
+
 
 app.get('/modules', async (req, res) => {
-    const query = 'module-info.java+language:Java'
+    const query = 'path:**/module-info.java+language:Java'
     const { data } = await octokit.request('GET /search/commits', {
         accept: 'application/vnd.github.text-match+json',
         q: query

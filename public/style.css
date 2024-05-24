@@ -1,0 +1,77 @@
+#container1{
+    display: grid;
+    grid-template-rows: [row1] 400px [info] 500px [final-row];
+   
+}
+
+
+
+#URL-div{
+    display: grid;
+
+    grid-row-start: row1;
+    grid-row-end: info;
+    grid-template-rows: [row1] 20% [row2] 20% [button-area] 20% [final-row2];
+}
+
+
+.item-in-URL{
+
+    align-self: center;
+    justify-self: center;
+    width: 50%;
+    height: 50%;
+}
+
+
+#item-in-URL{
+
+    align-self: center;
+    justify-self: center;
+    width: 50%;
+    height: 50%;
+}
+
+
+
+#info-div{
+
+    grid-row-start: info;
+    grid-row-end: final-row;
+}
+
+
+.css-button {
+    text-align: center;
+    width: 100%;
+    appearance: button;
+    background-color: #1899D6;
+    border: solid transparent;
+    border-radius: 16px;
+    border-width: 0 0 4px;
+    box-sizing: border-box;
+    color: #FFFFFF;
+    cursor: pointer;
+    display: inline-block;
+    font-family: din-round,sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: .8px;
+    line-height: 20px;
+    margin: 0;
+    outline: none;
+    overflow: visible;
+    padding: 13px 16px;
+    text-align: center;
+    text-transform: uppercase;
+    touch-action: manipulation;
+    transform: translateZ(0);
+    transition: filter .2s;
+    user-select: none;
+    -webkit-user-select: none;
+    vertical-align: middle;
+    white-space: nowrap;
+    width: 100%;
+  
+  
+  }
