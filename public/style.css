@@ -1,10 +1,11 @@
 #container1{
     display: grid;
     grid-template-rows: [row1] 400px [info] 500px [final-row];
-   
 }
 
-
+body{
+    background-color: rgb(205, 203, 203);
+}
 
 #URL-div{
     display: grid;
