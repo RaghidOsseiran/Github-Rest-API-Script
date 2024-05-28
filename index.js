@@ -1,6 +1,16 @@
 import express from 'express';
-import fetch from 'node-fetch'
+import {filter_result, buildCodeRequest, fetchContent, fetchRepoContent, initRequest, URL} from './public/utilitaries.js';
+import fetch from 'node-fetch';
+import dotenv from 'dotenv'
+dotenv.config()
+
+
+const token = process.env.GITHUB_AUTH_TOKEN
+
+
+
 const app = express()
+
 
 app.set('view engine', 'ejs')
 app.use(express.static("public"))
@@ -11,43 +21,46 @@ app.get('/', (req, res) => {
 })
 
 
-async function send_request(URL){
+// async function fetchRawContent(rawURL){
+//     const response = await fetch(rawURL)
+//     if (!response.ok){
+//         throw new Error(`Error fetching file content: ${response.statusText}`)
+//     }
+//     return await response.text();
+// }
+
+// function renderDetails(content){
+//     try{
+//         res.render('commitdetails', {content})
+//     } catch(error){
+//         console.error('Error in rendering')
+//         res.status(500).send('Internal server error in content')
+//     }
+// }
+
+
+
+export async function fetchRepoAuthContent(url){
     const headers = {
-        "Accept": "application/vnd.github.cloak-preview",
+        "Accept": "application/vnd.github+json",
+        "Authorization": `Bearer ${token}`
     }
-    console.log(URL)
-    const response = await fetch(URL, {
+    const response = await fetch(url, {
         "method": "GET",
         "headers": headers
     })
-    const result = await response.json()
-    return result
+    if (!response.ok) throw new Error('Error fetching data')
+    return await response.json()
 }
 
 
-async function fetchRawContent(rawURL){
-    const response = await fetch(rawURL)
-    if (!response.ok){
-        throw new Error(`Error fetching file content: ${response.statusText}`)
-    }
-    return await response.text();
-}
-
-function renderDetails(content){
-    try{
-        res.render('commitdetails', {content})
-    } catch(error){
-        console.error('Error in rendering')
-        res.status(500).send('Internal server error in content')
-    }
-}
 
 
 app.get('/commitdetails*', async (req, res) => {
-    const url_info = req.url.split("/").slice(5).join('/').replace("commit","commits")
-    const apiUrl = `https://api.github.com/repos/${url_info}`
+    const url_info = initRequest(req.url, 5)
+    const apiUrl = url_info.replace("commit","commits")
     try{
-        const commitDetails = await send_request(apiUrl)
+        const commitDetails = await fetchRepoContent(apiUrl)
         res.send(`
         <div class="commit-container">
             <h1>Commit Details</h1>
@@ -70,7 +83,44 @@ app.get('/commitdetails*', async (req, res) => {
     }
 })
 
+// https://api.github.com/search/code?q=repo%3ARaghidOsseiran/Test-usage-module+language:Java&type=code
+// https://api.github.com/search/code?q=repo%3AJava-fac+language:Java&type=code
+// https://api.github.com/search/code?q=repo%3ARaghidOsseiran%2FInit-to-Ocaml+language%3AOCaml&type=code
+
+app.get('/repocontent*', async (req, res) => {
+    const url_parts = req.url.split('/')
+    const owner = url_parts[6]
+    const repo = url_parts[7]
+    const url_info = buildCodeRequest(owner, repo)
+    console.log(url_info)
+    let main_div = "<div>"
+    try{   
+        let repo_content = await fetchRepoAuthContent(url_info)
+        repo_content = filter_result(repo_content)
+        if (repo_content.total_count == 0){
+            res.send("No content currently available using the GitHub Rest API, code might be in index phase, try again later.")
+            return
+        } else if (repo_content.items.length == 0) {
+            res.send("No module-info.java in this repo")
+            return
+        }
+        repo_content.items.forEach(async (i) => {
+            const message = `<p>
+            <h1>Filename: ${i.name}</h1> 
+            File path: ${i.path}<br><br>
+            Code URL: <a href="${i.html_url}">Go to Page</a><br><br></p>
+            `
+            main_div += message + "<br><br>"
+        })
+        main_div+= "</div>"
+        res.send(main_div)
+    } catch(error){
+        console.log('Error in repoContent')
+        res.status(500).send('Internal server error')
+    }
+})
 
 
 
-app.listen(3000)
+
+app.listen(3003)
