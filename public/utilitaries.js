@@ -84,6 +84,9 @@ export function buildRepoRequest(username){
     return (URL+"/search/repositories?q=user:"+username+"+language:Java+module")
 }
 
+export function buildIssueRequest(username){
+    return (URL+"/search/issues?q=owner:"+username+"+language:Java+type:pr+module-info.java")
+}
 
 
 // BUILDS THE CORRECT COMMITS REQUEST TO SEND TO THE GITHUB API

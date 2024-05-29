@@ -92,7 +92,6 @@ app.get('/repocontent*', async (req, res) => {
     const owner = url_parts[6]
     const repo = url_parts[7]
     const url_info = buildCodeRequest(owner, repo)
-    console.log(url_info)
     let main_div = "<div>"
     try{   
         let repo_content = await fetchRepoAuthContent(url_info)

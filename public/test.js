@@ -1,4 +1,4 @@
-import {fetchContent, fetchRepoContent, buildCommitsRequest, isImportantCommit, split_And_Correct, construct_paths, buildRepoRequest, initRequest, URL} from './utilitaries.js'
+import {fetchContent, fetchRepoContent, buildCommitsRequest, isImportantCommit, split_And_Correct, construct_paths, buildRepoRequest, initRequest, URL, buildIssueRequest} from './utilitaries.js'
 
 const buttonRequest = document.getElementById("item-in-URL")
 buttonRequest.addEventListener("click", () => sendRequest())
@@ -62,15 +62,6 @@ async function sendRepoRequest(username){
 
 
         const up_url = split_And_Correct(i.contents_url)
-        console.log("new url: "+up_url)
-
-
-        // const all_path = await searchForModuleInfoFiles(up_url, i.owner.login, i.name)
-        // all_path = construct_paths(all_path, i.html_url)
-
-
-        // Paths to all module-info.java: ${all_path.join('<br>')}<br><br></br>
-        
         const message = document.createElement("p")
         message.innerHTML = `
         <h1>Repository: ${i.name}</h1> 
@@ -89,7 +80,22 @@ async function sendRepoRequest(username){
 
 
 async function sendIssuesRequest(username){
-    console.log("3")
+    clear()
+    const new_url = buildIssueRequest(username)
+    const result = await fetchRepoContent(new_url)
+    result.items.forEach(async (i) => {
+        const message = document.createElement("p")
+        message.innerHTML = `
+        <h1>Issue number ${i.number}</h1><br><br>
+        <h1>Title: ${i.title}</h1>
+        body: ${i.body}<br><br>
+        Merge URL: <a href="${i.html_url}">Go to page</a><br><br>
+        State: ${i.state}<br><br>
+        Creation date: ${i.created_at}<br><br>
+        `
+        info_text.appendChild(message)
+        info_text.appendChild(document.createElement("br"))
+    })
     return
 }
 
