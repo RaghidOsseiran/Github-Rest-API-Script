@@ -1,4 +1,4 @@
-import {fetchContent, fetchRepoContent, buildCommitsRequest, isImportantCommit, split_And_Correct, construct_paths, buildRepoRequest, initRequest, URL, buildIssueRequest} from './utilitaries.js'
+import {fetchContent, fetchRepoContent, buildCommitsRequest, isImportantCommit, split_And_Correct, construct_paths, buildRepoRequest, initRequest, URL, buildIssueRequest, isImportantIssue} from './utilitaries.js'
 
 const buttonRequest = document.getElementById("item-in-URL")
 buttonRequest.addEventListener("click", () => sendRequest())
@@ -38,7 +38,7 @@ async function sendCommitsRequest(username){
     const new_url = buildCommitsRequest(username)
     const result = await fetchRepoContent(new_url)
     result.items.forEach(i => {
-        if (isImportantCommit(i.commit)){
+        if (isImportantCommmit(i.commit)){
             const message = document.createElement("p")
             message.innerHTML = `Commit URL: <a href=${i.html_url}>${i.html_url}</a><br><br>
                                 <Button><a href="/commitdetails/${i.html_url}">See commit details</a></button><br><br>
@@ -84,17 +84,19 @@ async function sendIssuesRequest(username){
     const new_url = buildIssueRequest(username)
     const result = await fetchRepoContent(new_url)
     result.items.forEach(async (i) => {
-        const message = document.createElement("p")
-        message.innerHTML = `
-        <h1>Issue number ${i.number}</h1><br><br>
-        <h1>Title: ${i.title}</h1>
-        body: ${i.body}<br><br>
-        Merge URL: <a href="${i.html_url}">Go to page</a><br><br>
-        State: ${i.state}<br><br>
-        Creation date: ${i.created_at}<br><br>
-        `
-        info_text.appendChild(message)
-        info_text.appendChild(document.createElement("br"))
+        if(isImportantIssue(i.body)){
+            const message = document.createElement("p")
+            message.innerHTML = `
+            <h1>Issue number ${i.number}</h1><br><br>
+            <h1>Title: ${i.title}</h1>
+            body: ${i.body}<br><br>
+            Merge URL: <a href="${i.html_url}">Go to page</a><br><br>
+            State: ${i.state}<br><br>
+            Creation date: ${i.created_at}<br><br>
+            `
+            info_text.appendChild(message)
+            info_text.appendChild(document.createElement("br"))
+        }
     })
     return
 }

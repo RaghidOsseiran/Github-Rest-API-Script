@@ -48,6 +48,14 @@ export function isImportantCommit(commit) {
     return isModuleInfoRelated;
 }
 
+export function isImportantIssue(issue_body){
+    if (issue_body != null){
+        const is_important = issue_body.includes("module-info.java");
+        return is_important;
+    }
+    return false;
+}
+
 export function filter_result(data){
     return {
         total_count: data.total_count,
