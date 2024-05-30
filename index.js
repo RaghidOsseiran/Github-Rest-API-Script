@@ -7,8 +7,6 @@ dotenv.config()
 
 const token = process.env.GITHUB_AUTH_TOKEN
 
-
-
 const app = express()
 
 
@@ -17,27 +15,8 @@ app.use(express.static("public"))
 
 
 app.get('/', (req, res) => {
-    res.render("index")
+    res.render("index", {apiKey: token})
 })
-
-
-// async function fetchRawContent(rawURL){
-//     const response = await fetch(rawURL)
-//     if (!response.ok){
-//         throw new Error(`Error fetching file content: ${response.statusText}`)
-//     }
-//     return await response.text();
-// }
-
-// function renderDetails(content){
-//     try{
-//         res.render('commitdetails', {content})
-//     } catch(error){
-//         console.error('Error in rendering')
-//         res.status(500).send('Internal server error in content')
-//     }
-// }
-
 
 
 export async function fetchRepoAuthContent(url){
@@ -122,4 +101,4 @@ app.get('/repocontent*', async (req, res) => {
 
 
 
-app.listen(3003)
+app.listen(3000)

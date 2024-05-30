@@ -22,11 +22,20 @@
         <div id="info-div">
             <p></p>
         </div>
+        <div id="container"></div>
     </div>
     
 
 
 
-    <script src="../test.js" type="module"></script>
+    <script src="./client.js" type="module"></script>
+    <script>
+        const apiKey = "<%= apiKey %>"
+        const p_hidden = `
+        <p style="display:none" id="apiKey">${apiKey}</p>
+        `
+        const container = document.getElementById("container")
+        container.innerHTML += p_hidden
+    </script>
 </body>
 </html>

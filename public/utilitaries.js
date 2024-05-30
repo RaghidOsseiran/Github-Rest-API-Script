@@ -86,8 +86,15 @@ export function construct_paths(all_path, base){
 
 
 
+// https://api.github.com/search/code?q=module-info.java+language%3AJava
+
+
 
 // BUILDS THE CORRECT REPOSITORY REQUEST TO SEND TO THE GITHUB API
+// export function buildRepoRequest(username){
+//     return (URL+"/search/code?q=user:"+username+"+module-info.java+language:Java")
+// }
+
 export function buildRepoRequest(username){
     return (URL+"/search/repositories?q=user:"+username+"+language:Java+module")
 }

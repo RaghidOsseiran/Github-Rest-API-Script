@@ -1,5 +1,8 @@
 import {fetchContent, fetchRepoContent, buildCommitsRequest, isImportantCommit, split_And_Correct, construct_paths, buildRepoRequest, initRequest, URL, buildIssueRequest, isImportantIssue} from './utilitaries.js'
 
+
+
+
 const buttonRequest = document.getElementById("item-in-URL")
 buttonRequest.addEventListener("click", () => sendRequest())
 
@@ -8,6 +11,7 @@ const toCall = [sendCommitsRequest, sendRepoRequest, sendIssuesRequest]
 
 const info_text = document.getElementById("info-div");
 
+const apiKey = document.getElementById("apiKey")
 
 function sendRequest(){
     const reqType = document.getElementById("search-input")
@@ -26,19 +30,12 @@ function sendRequest(){
 }
 
 
-
-
-
-
-
-
-
 async function sendCommitsRequest(username){
     clear();
     const new_url = buildCommitsRequest(username)
     const result = await fetchRepoContent(new_url)
     result.items.forEach(i => {
-        if (isImportantCommmit(i.commit)){
+        if (isImportantCommit(i.commit)){
             const message = document.createElement("p")
             message.innerHTML = `Commit URL: <a href=${i.html_url}>${i.html_url}</a><br><br>
                                 <Button><a href="/commitdetails/${i.html_url}">See commit details</a></button><br><br>
@@ -51,6 +48,48 @@ async function sendCommitsRequest(username){
     })
     return
 }
+
+
+
+
+async function fetchRepoAuthContent(url){
+    const headers = {
+        "Accept": "application/vnd.github+json",
+        "Authorization": `Bearer ${apiKey.innerHTML}`
+    }
+    const response = await fetch(url, {
+        "method": "GET",
+        "headers": headers
+    })
+    if (!response.ok) throw new Error('Error fetching data')
+    return await response.json()
+}
+
+
+
+// async function sendRepoRequest(username){
+//     clear();
+//     const new_url = buildRepoRequest(username)
+//     const result = await fetchRepoAuthContent(new_url)
+//     result.items.forEach(async (i) => {
+//         if (isImportantIssue(i.name)){
+//             console.log("is Important")
+//             const message = document.createElement("p")
+//             message.innerHTML = `
+//             <h1>Repository: ${i.repository.name}</h1> 
+//             Repo description: ${i.repository.description}<br><br>
+//             Repo URL: <a href="${i.repository.html_url}">Go to Page</a><br><br>
+//             Content URL: <Button><a href="/repocontent/${i.html_url}">Go to Page</a></Button><br><br>
+//             Created at: ${i.created_at}<br><br>
+//             Last updated at: ${i.updated_at}<br><br>
+//             `
+//             info_text.appendChild(message)
+//             info_text.appendChild(document.createElement("br"))
+//         }
+//         // const up_url = split_And_Correct(i.contents_url)
+//     })
+//     return
+// }
 
 
 
