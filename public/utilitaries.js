@@ -1,161 +1,138 @@
-
-// https://docs.github.com/en/rest/repos/contents?apiVersion=2022-11-28#get-repository-content FOR THE CONTENT INSIDE THE REPOSITORIES
-
-export const URL = "https://api.github.com"
+import {fetchRepoAuthContent} from './client.js'
 
 
+////////////////////// ALL UTIL //////////////////////
 
-export async function fetchContent(url, owner, repo, path=''){
-    console.log("in fetch content"+ owner+','+repo+','+path)
-    const headers = {
-        "Accept": "application/vnd.github+json",
+
+export function notNull(item) {
+    return item !== null && item !== undefined;
+}
+
+
+
+////////////////////// CODE REQUEST UTILITARY FUNCTIONS //////////////////////
+
+
+export function filterCodeResponse(data){
+    let paragraphRes = document.createElement("p")
+    let textRes = ''
+    data.items.forEach((item) => {
+        if (item.name.includes("module-")){
+            textRes+= `
+                <h1>Path: ${item.path}</h1>
+                <button>Code link:<a href="${item.html_url}">Click here</a></button> <br><br>
+                => Brief description: ${item.repository.description} <br><br>
+                <h2>Repository details:</h2> 
+                => Full repository path: ${item.repository.full_name} <br><br>
+                => Repository link: <a href="${item.repository.html_url}">Click here</a> <br><br>
+                <p>---------------------------------------------<p><br><br>
+                `
+        }
+    }) 
+    paragraphRes.innerHTML = textRes
+    return paragraphRes
+}
+
+
+////////////////////// ISSUES REQUEST UTILITARY FUNCTIONS //////////////////////
+
+
+
+export function getUserRepoFromUrl(issueRepoURL){
+    if (notNull(issueRepoURL)){
+    return{
+            user: issueRepoURL.split('/')[3],
+            repo: issueRepoURL.split('/')[4]
+        }
     }
-    const response = await fetch(url, {
-        "method": "GET",
-        "headers": headers ,
-    })
-    if (!response.ok) throw new Error('Error fetching data')
-    return await response.json()
-    
+    throw new Error('cannot split an empty object')
 }
 
 
+export async function possiblyValidPr(issueItem, baseURL){
+    const {user, repo} = getUserRepoFromUrl(issueItem.html_url)
+    const url_Req = baseURL+"code?q=user:"+user+"+repo:"+user+"/"+repo+"+requires+language:Java"
+    const response = await fetchRepoAuthContent(url_Req)
+    console.log(response.total_count > 0)
+    return (response.total_count > 0)
+}
 
-export async function fetchRepoContent(url){
-    const headers = {
-        "Accept": "application/vnd.github+json"
+
+export async function issuesFilterByRepoContent(issueRepo, baseURL){
+    if (notNull(issueRepo)){
+        const paragraphRes = document.createElement("p")
+        let textRes = ''
+        for(const item of issueRepo.items){
+            const isValid = await possiblyValidPr(item, baseURL)
+            if (isValid) {
+                textRes += `
+                <h1> Pull request title: ${item.title} </h1>
+                => Brief description: ${item.body+"..."}
+                <h2> Pull request information: </h2>
+                => User: <b> ${item.user.login} </b> <br><br>
+                => Pr link: <a href="${item.html_url}">Click here</a> <br><br>
+                => Pr state: ${item.state}<br><br>
+                => Creation date: ${item.created_at}<br><br>
+                `
+            }
+        }
+        paragraphRes.innerHTML = textRes
+        return paragraphRes
     }
-    const response = await fetch(url, {
-        "method": "GET",
-        "headers": headers
-    })
-    if (!response.ok) throw new Error('Error fetching data')
-    return await response.json()
+    throw new Error('Invalid issue repo request')
 }
 
 
-//https://api.github.com/search/issues?q=author:RaghidOsseiran
+////////////////////// COMMITS REQUEST UTILITARY FUNCTIONS //////////////////////
 
 
-
-
-
-
-
-export function isImportantCommit(commit) {
-    const message = commit.message.toLowerCase();
-    const isModuleInfoRelated = message.includes("module-info.java");
-    return isModuleInfoRelated;
+export async function possiblyValidCommit(issueItem, baseURL){
+    const {user, repo} = getUserRepoFromUrl(issueItem.repository.html_url)
+    const url_Req = baseURL+"code?q=user:"+user+"+repo:"+user+"/"+repo+"+requires+language:Java"
+    const response = await fetchRepoAuthContent(url_Req)
+    return (response.total_count > 0)
 }
 
-export function isImportantIssue(issue_body){
-    if (issue_body != null){
-        const is_important = issue_body.includes("module-info.java");
-        return is_important;
+
+
+export async function commitsFilterByRepoContent(issueRepo, baseURL) {
+    if (notNull(issueRepo)) {
+        const paragraphRes = document.createElement("p");
+        let textRes = '';
+
+        for (const item of issueRepo.items) {
+            const isValid = await possiblyValidCommit(item, baseURL);
+            if (isValid) {
+                textRes += `
+                <h1> Commit message: ${item.commit.message} </h1>
+                <h2> Commit information: </h2>
+                => Commiter: <b> ${item.commit.committer.name} </b> <br><br>
+                => Commit link: <a href="${item.html_url}">Click here</a> <br><br>
+                => Repository of commit link: <a href="${item.repository.html_url}">Click here</a><br><br>
+                => Commit date: ${item.commit.author.date}<br><br>
+                `;
+            }
+        }
+        paragraphRes.innerHTML = textRes;
+        return paragraphRes;
     }
-    return false;
-}
-
-export function filter_result(data){
-    return {
-        total_count: data.total_count,
-        items: data.items.filter(item => item.name === 'module-info.java')
-    };
+    throw new Error('Invalid issue repo request');
 }
 
 
 
-////////////////////////// URL MANIPULAITON FUNCTIONS
+////////////////////// REQUEST BUILDERS //////////////////////
 
 
-
-
-// FUNCTION TO BE ABLE TO SEND THE REQUEST TO GET THE CONTENT (REMOVES THE ${/path})
-export function split_And_Correct(url){
-    let parts = url.split('/')
-    parts.pop()
-    parts.pop()
-    return parts.join('/')
+export function codeRequestBuilder(baseURL, username){
+    return baseURL+"code?q=user:"+username+"+extension:java+exports"
 }
 
 
-// CORRECTLY BUILDING THE PATHS TO ALL MODULE-INFO.JAVA FILES  (FOR RECURSIVE ALGORITHM)
-export function construct_paths(all_path, base){
-    return all_path.map(path => base+'/'+path)
+export function issuesRequestBuilder(baseURL, username){
+    return baseURL+"issues?q=user:"+username+"+type:pr+module+language:Java"
 }
 
-
-
-// https://api.github.com/search/code?q=module-info.java+language%3AJava
-
-
-
-// BUILDS THE CORRECT REPOSITORY REQUEST TO SEND TO THE GITHUB API
-// export function buildRepoRequest(username){
-//     return (URL+"/search/code?q=user:"+username+"+module-info.java+language:Java")
-// }
-
-export function buildRepoRequest(username){
-    return (URL+"/search/repositories?q=user:"+username+"+language:Java+module")
+export function commitsRequestBuilder(baseURL, username){
+    return baseURL+"commits?q=user:"+username+"+module"
 }
-
-export function buildIssueRequest(username){
-    return (URL+"/search/issues?q=owner:"+username+"+language:Java+type:pr+module-info.java")
-}
-
-
-// BUILDS THE CORRECT COMMITS REQUEST TO SEND TO THE GITHUB API
-export function buildCommitsRequest(username){
-    return (URL + "/search/commits?q=user:"+username+"+ module-info.java")
-}
-
-
-// https://api.github.com/search/code?q=repo%3ARaghidOsseiran%2FJava-fac+language%3AJava&type=code
-
-
-export function buildCodeRequest(username, repo){
-    return (URL+"/search/code?q=repo%3A"+username+"/"+repo+"+language:Java&type=code")
-}
-
-export function initRequest(URL, i){
-    const url_info = URL.split('/').slice(i).join('/')
-    return ("https://api.github.com/repos/"+url_info)
-}
-
-
-///////////////////////////////////////////////////////////////////////
-
-
-// RECURSIVE ALGORITHM TO FIND ALL MODULES-INFO.JAVA FILES (CAN BE OPTIMISED)
-
-// async function findModuleInfoFiles(baseUrl, path, owner, repoName) {
-//     let url = ''
-//     if (path != ''){
-//         url = `${baseUrl}/${path}`;
-//     } else {
-//         url = baseUrl
-//     }
-//     console.log('in recursive:' + url)
-//     const contents = await fetchContent(url, owner, repoName, path);
-//     let moduleInfoFiles = [];
-
-//     for (const item of contents) {
-//         if (item.type === 'dir') {
-//             const subPath = item.path;
-//             const subFiles = await findModuleInfoFiles(baseUrl, subPath, owner, repoName);
-//             moduleInfoFiles = moduleInfoFiles.concat(subFiles);
-//         } else if (item.type === 'file' && item.name === 'module-info.java' && item.name != 'outDir') {
-//             moduleInfoFiles.push(item.path);
-//         }
-//     }
-//     return moduleInfoFiles;
-// }
-
-
-
-// async function searchForModuleInfoFiles(url, owner, repoName){
-//     const moduleInfoFiles = await findModuleInfoFiles(url, '', owner, repoName)
-//     return moduleInfoFiles
-// }
-
-/////////////////////////////////////////////////////////////////////////////////////////////
