@@ -77,7 +77,7 @@ export async function fetchRepoAuthContent(url){
         "headers": headers
     })
     if (!response.ok) throw new Error('Error fetching data')
-    return response.json()
+    return await response.json()
 }
 
 

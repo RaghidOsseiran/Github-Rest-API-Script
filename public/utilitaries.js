@@ -154,6 +154,10 @@ export function commitsRepoRequestBuilder(baseURL, username, repo){
 
 
 
+export function issuesRepoRequestBuilder(baseURL, username, repo){
+    return `${baseURL}issues?q=user:${username}+repo:${username}/${repo}+language:Java+module`
+}
+
 
 
 
@@ -191,3 +195,43 @@ export async function buildResponseCommit(result, repo){
     return response
 }
 
+
+////////////////////// ISSUES ////////////////////////////////////
+
+
+
+function checkInRepo(url, repo){
+    if (url){
+        const repoInUrl = url.split('/')[5]
+        return (repoInUrl == repo)   
+    }    
+    throw new Error("invalid url to check in repo")
+}
+
+
+
+export async function buildResponseIssues(result, repo){
+    let response = ``
+    if (result){
+        for (const item of result.items){
+            const inRepo = checkInRepo(item.repository_url, repo)
+            if (inRepo){
+                if (item.pull_request != undefined){
+                    response+= `<tr>    
+                                <td>Issues(Pr)</td>`
+                } else {
+                    response+= `<tr>    
+                                    <td>Issues</td>`
+                }
+                response+=  `       <td>${item.created_at}</td>
+                                    <td><a href="${item.html_url}">Link</a></td>
+                                    <td>${item.state}</td>
+                                    <td>${item.body}
+                                </tr>`
+            }
+        }
+    } else {
+        throw new Error("invalid query result")
+    }
+    return response
+}
