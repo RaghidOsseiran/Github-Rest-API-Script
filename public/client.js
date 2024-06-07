@@ -1,19 +1,29 @@
 import { codeRequestBuilder, commitsFilterByRepoContent, commitsRequestBuilder, filterCodeResponse, issuesFilterByRepoContent, issuesRequestBuilder, notNull } from "./utilitaries.js"
 
 
+
+
+////////////////////////// INDEX PAGE /////////////////////////////////////////
+
 const buttonRequest = document.getElementById("item-in-URL")
-buttonRequest.addEventListener("click", () => sendRequest())
+if (buttonRequest) {
+    buttonRequest.addEventListener("click", () => sendRequest());
+}
 
 const reqTab = ["Commits", "Code", "Issues"]
 const callTab = [sendCommitsRequest, sendCodeRequest, sendIssuesRequest]
 
 const info_div = document.getElementById("info-div")
-export const apiKey = document.getElementById("apiKey").innerHTML
+const apiKeyEx = document.getElementById("apiKey")
+let apiKey = null
+if (apiKeyEx){
+    apiKey = apiKeyEx.innerHTML
+}
 
-const baseURL = "https://api.github.com/search/"
+export const baseURL = "https://api.github.com/search/"
+export const timeoutDuration = 5000
 
-
-
+//////////////////////////////////////////////////////////////////////////////////
 
 
 ////////////////////// HTML PAGE //////////////////////
@@ -57,6 +67,7 @@ function sendRequest(){
 
 
 export async function fetchRepoAuthContent(url){
+    console.log("how many times in here"+ ", current apiKey:"+apiKey)
     const headers = {
         "Accept": "application/vnd.github+json",
         "Authorization": `Bearer ${apiKey}`
@@ -66,7 +77,7 @@ export async function fetchRepoAuthContent(url){
         "headers": headers
     })
     if (!response.ok) throw new Error('Error fetching data')
-    return await response.json()
+    return response.json()
 }
 
 

@@ -15,4 +15,8 @@ app.get('/', (req, res) => {
 })
 
 
+app.get('/repoRequest', (req, res) => {
+    res.render("table", {apiKey: process.env.GITHUB_AUTH_TOKEN})
+})
+
 app.listen(3000)

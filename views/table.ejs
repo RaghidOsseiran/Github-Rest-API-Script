@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="tableStyle.css">
+</head>
+<body>
+    <button id="back-to-main"><a href="/">Back to main</a></button>
+    <div id="container1">
+        <div id="item1-in-c1">
+            <input type="text" id="repoString" placeholder="Enter GitHub Repo">
+            <button style="width: 100%; margin-left: 12px;" id="sub-but">Submit</button>
+        </div>
+        <div id="item2-in-c1">
+            <table id="table-info">
+            </table>
+        </div>
+    </div>
+    <div id="container"></div>
+    <script src="./repoclient.js" type="module"></script>
+    <script>
+        const apiKey = "<%= apiKey %>"
+        const p_hidden = `
+        <p style="display:none" id="apiKey">${apiKey}</p>
+        `
+        const container = document.getElementById("container")
+        container.innerHTML += p_hidden
+    </script>
+</body>
+</html>

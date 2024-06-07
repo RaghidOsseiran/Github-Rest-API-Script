@@ -1,0 +1,41 @@
+Make a function that generates dynamically a table that holds all the info previously extracted, with the functionality of making a request 
+to get data from a certain repo only
+
+
+
+
+Table squeleton:
+
+
+<table>
+        <colgroup>
+            <col>
+            <col>
+            <col>
+        </colgroup>
+        <tr>
+            <th>Type</th>
+            <th>Date</th>
+            <th>Link</th>
+            <th>State</th>
+            <th>Message</th>
+        </tr>
+        <tr>
+            <td>Commit</td>
+            <td>24-07-2024</td>
+            <td>https://...</td>
+            <td>None</td>
+            <td>This commits introduces ...</td>
+        </tr>
+        <tr>
+            <td>None</td>
+            <td>Marketing Manager</td>
+            <td>example2@company.com</td>
+        </tr>
+        <tr>
+            <td>Zendaya Grace</td>
+            <td>CEO</td>
+            <td>example2@company.com</td>
+        </tr>
+      </table>
+      

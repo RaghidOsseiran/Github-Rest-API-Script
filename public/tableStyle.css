@@ -1,0 +1,39 @@
+table, th, td {
+    border: 1px solid black;
+  	border-collapse: collapse;
+}
+th, td {
+  	padding: 10px;
+}
+
+
+
+#back-to-main{
+	background-color: cyan;
+	padding: 10px;
+	margin-bottom: 5px;
+}
+
+#container1{
+	display: grid;
+	grid-template-rows: [row1]150px [final-row];
+	border: red solid;
+	width: 100%;
+}
+
+#item1-in-c1{
+	width: 50%;
+	grid-row-start: row1;
+	grid-row-end: final-row;
+	justify-self: center;
+}
+
+#item2-in-c1{
+	grid-row-start: final-row;
+	justify-self: center;
+}
+
+#repoString{
+	padding: 10px;
+	width: 100%;
+}

@@ -1,4 +1,4 @@
-import {fetchRepoAuthContent} from './client.js'
+import {baseURL, fetchRepoAuthContent} from './client.js'
 
 
 ////////////////////// ALL UTIL //////////////////////
@@ -8,6 +8,13 @@ export function notNull(item) {
     return item !== null && item !== undefined;
 }
 
+export function timeout(ms) {
+    return new Promise((_, reject) => {
+        setTimeout(() => {
+            reject(new Error('Request timed out'));
+        }, ms);
+    });
+}
 
 
 ////////////////////// CODE REQUEST UTILITARY FUNCTIONS //////////////////////
@@ -88,7 +95,7 @@ export async function issuesFilterByRepoContent(issueRepo, baseURL){
 
 export async function possiblyValidCommit(issueItem, baseURL){
     const {user, repo} = getUserRepoFromUrl(issueItem.repository.html_url)
-    const url_Req = baseURL+"code?q=user:"+user+"+repo:"+user+"/"+repo+"+requires+language:Java"
+    const url_Req = baseURL+"code?q=user:"+user+"+repo:"+user+"/"+repo+"+exports+language:Java"
     const response = await fetchRepoAuthContent(url_Req)
     return (response.total_count > 0)
 }
@@ -136,3 +143,51 @@ export function issuesRequestBuilder(baseURL, username){
 export function commitsRequestBuilder(baseURL, username){
     return baseURL+"commits?q=user:"+username+"+module"
 }
+
+
+/////////////////////// REPO REQUEST BUILDERS //////////////////////////
+
+
+export function commitsRepoRequestBuilder(baseURL, username, repo){
+    return `${baseURL}commits?q=user:${username}+repo:${username}/${repo}+module`
+}
+
+
+
+
+
+
+/////////////////////// REPO REQUEST UTILS /////////////////////////////
+
+export function getAndSplit(fullRepo){
+    const split = fullRepo.split('/')
+    return {
+        username: split[0],
+        repo: split[1]
+    }
+}
+
+////////////////////// COMMITS ///////////////////////////////////////:
+
+
+export async function buildResponseCommit(result, repo){
+    let response = ``
+    if (result){
+        for (const item of result.items){
+            const isValid = await possiblyValidCommit(item, baseURL)
+            if (isValid && item.repository.name == repo){
+                response+= `<tr>    
+                            <td>Commit</td>
+                            <td>${item.commit.author.date}</td>
+                            <td><a href="${item.html_url}">Link</a></td>
+                            <td>None</td>
+                            <td>${item.commit.message}
+                            </tr>`
+            }
+        }
+    } else {
+        throw new Error("invalid query result")
+    }
+    return response
+}
+
